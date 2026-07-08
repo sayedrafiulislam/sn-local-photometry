@@ -1,0 +1,6 @@
+data_shape,dec_key,dec_val,error,file,filter_key,filter_val,has_wcs,n_hdus,object_key,object_val,pixscale_arcsec,ra_key,ra_val,readable,redshift_key,redshift_val
+"(2477, 2469)",CRVAL2,18.061722,,D:\Thesis\pd\CSPAll\ASAS14ad_B_comb_dup.fits,,,True,1,OBJECT,ASAS14ad,0.23000000000000403,CRVAL1,190.047458,True,,
+"(2471, 2468)",CRVAL2,18.061722,,D:\Thesis\pd\CSPAll\ASAS14ad_V_comb_dup.fits,,,True,1,OBJECT,ASAS14ad,0.23000000000000403,CRVAL1,190.047458,True,,
+"(2432, 2441)",CRVAL2,-70.646972,,D:\Thesis\pd\CSPAll\ASAS14hp_B_comb_dup.fits,,,True,1,OBJECT,ASAS14hp,0.23000000000000403,CRVAL1,322.625708,True,,
+"(2434, 2437)",CRVAL2,-70.646972,,D:\Thesis\pd\CSPAll\ASAS14hp_V_comb_dup.fits,,,True,1,OBJECT,ASAS14hp,0.23000000000000403,CRVAL1,322.625708,True,,
+"(2433, 2430)",CRVAL2,-14.517528,,D:\Thesis\pd\CSPAll\ASAS14hr_B_comb_dup.fits,,,True,1,OBJECT,ASAS14hr,0.23000000000000403,CRVAL1,27.671958,True,,
