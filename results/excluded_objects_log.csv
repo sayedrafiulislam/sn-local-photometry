@@ -1,0 +1,83 @@
+object,n_files_affected,ned_error,reason_category
+CSP12F,3,,"CSP-internal designator, no IAU name"
+CSP12K,1,,"CSP-internal designator, no IAU name"
+CSP12M,3,,"CSP-internal designator, no IAU name"
+CSP12N,3,"CSP12N: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13aad,3,,"CSP-internal designator, no IAU name"
+CSP13aae,1,,"CSP-internal designator, no IAU name"
+CSP13aaf,3,,"CSP-internal designator, no IAU name"
+CSP13aap,2,,"CSP-internal designator, no IAU name"
+CSP13aaq,2,,"CSP-internal designator, no IAU name"
+CSP13aaw,2,,"CSP-internal designator, no IAU name"
+CSP13aax,2,,"CSP-internal designator, no IAU name"
+CSP13aay,2,,"CSP-internal designator, no IAU name"
+CSP13ab,1,,"CSP-internal designator, no IAU name"
+CSP13aba,2,,"CSP-internal designator, no IAU name"
+CSP13abl,3,,"CSP-internal designator, no IAU name"
+CSP13abs,2,,"CSP-internal designator, no IAU name"
+CSP13ag,2,,"CSP-internal designator, no IAU name"
+CSP13al,2,,"CSP-internal designator, no IAU name"
+CSP13am,2,,"CSP-internal designator, no IAU name"
+CSP13an,3,,"CSP-internal designator, no IAU name"
+CSP13ay,1,,"CSP-internal designator, no IAU name"
+CSP13B,3,"CSP13B: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13bf,3,,"CSP-internal designator, no IAU name"
+CSP13bh,3,,"CSP-internal designator, no IAU name"
+CSP13C,1,"CSP13C: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13G,1,"CSP13G: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13M,2,"CSP13M: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13N,2,"CSP13N: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13P,3,"CSP13P: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13Q,3,"CSP13Q: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13U,3,"CSP13U: The remote service returned the following error message.
+ERROR:  Name checking server EGRET error.",NED name-checker server error
+CSP13Y,3,,"CSP-internal designator, no IAU name"
+CSP13Z,1,,"CSP-internal designator, no IAU name"
+CSP14aaa,2,,"CSP-internal designator, no IAU name"
+CSP14aab,2,,"CSP-internal designator, no IAU name"
+CSP14aal,2,,"CSP-internal designator, no IAU name"
+CSP14aar,3,,"CSP-internal designator, no IAU name"
+CSP14aaw,3,,"CSP-internal designator, no IAU name"
+CSP14aax,2,,"CSP-internal designator, no IAU name"
+CSP14aay,2,,"CSP-internal designator, no IAU name"
+CSP14aba,2,,"CSP-internal designator, no IAU name"
+CSP14abf,3,,"CSP-internal designator, no IAU name"
+CSP14abh,2,,"CSP-internal designator, no IAU name"
+CSP14abl,3,,"CSP-internal designator, no IAU name"
+CSP14abn,1,,"CSP-internal designator, no IAU name"
+CSP14acl,1,,"CSP-internal designator, no IAU name"
+CSP14acm,2,,"CSP-internal designator, no IAU name"
+CSP14acp,3,,"CSP-internal designator, no IAU name"
+CSP14adc,2,,"CSP-internal designator, no IAU name"
+CSP14adf,2,,"CSP-internal designator, no IAU name"
+CSP15aaj,3,,"CSP-internal designator, no IAU name"
+CSP15aak,1,,"CSP-internal designator, no IAU name"
+CSP15B,3,,"CSP-internal designator, no IAU name"
+LSQ13dsm,2,,"LSQ-internal designator, no IAU name"
+LSQ14ghv,3,,"LSQ-internal designator, no IAU name"
+PTF11pbp,3,,"PTF-internal designator, no IAU name"
+PTF11ppn,3,,"PTF-internal designator, no IAU name"
+PTF11pra,3,,"PTF-internal designator, no IAU name"
+PTF13anh,2,,"PTF-internal designator, no IAU name"
+PTF13duj,3,,"PTF-internal designator, no IAU name"
+PTF13dwl,2,,"PTF-internal designator, no IAU name"
+PTF13dym,2,,"PTF-internal designator, no IAU name"
+PTF13ebh,3,,"PTF-internal designator, no IAU name"
+PTF13efe,3,,"PTF-internal designator, no IAU name"
+PTF13ez,2,,"PTF-internal designator, no IAU name"
+PTF14aje,2,,"PTF-internal designator, no IAU name"
+PTF14fpg,3,,"PTF-internal designator, no IAU name"
+PTF14gnl,2,,"PTF-internal designator, no IAU name"
+PTF14uo,2,,"PTF-internal designator, no IAU name"
+PTF14w,3,,"PTF-internal designator, no IAU name"
+PTF14yy,2,,"PTF-internal designator, no IAU name"
+SN09J,2,"SN09J: The remote service returned the following error message.
+ERROR: The object name that you have submitted is not currently recognized by the NED name interpreter.",not recognized by NED name interpreter
