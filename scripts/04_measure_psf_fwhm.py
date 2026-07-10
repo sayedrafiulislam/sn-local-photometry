@@ -68,6 +68,9 @@ SN_EXCLUSION_RADIUS_PIX = 20   # mask radius around the SN position, if known
 MAX_STARS_PER_IMAGE = 25       # cap for speed; DAOStarFinder often over-detects
 DAOFIND_FWHM_GUESS = 4.0       # rough initial guess in pixels, only used for detection
 DAOFIND_THRESHOLD_NSIGMA = 8.0 # detection threshold in units of background sigma
+BORDER_MARGIN_PIX = 60         # exclude detections within this many pixels of any edge
+                                # (edge/overscan artifacts can otherwise be misidentified
+                                # as point sources -- confirmed visually in Phase 1 testing)
 
 FILENAME_RE = re.compile(r"^(?P<obj>.+?)_(?P<filt>[BV])_comb_(?P<tel>dup|swo)\.fits$")
 
@@ -85,8 +88,8 @@ def detect_stars(data, bkg_mean, bkg_std):
     daofind = DAOStarFinder(
         fwhm=DAOFIND_FWHM_GUESS,
         threshold=DAOFIND_THRESHOLD_NSIGMA * bkg_std,
-        sharplo=0.2, sharphi=1.0,   # reject cosmic rays (too sharp) / galaxies (too flat)
-        roundlo=-0.5, roundhi=0.5,  # reject elongated / blended sources
+        sharpness_range=(0.2, 1.0),  # reject cosmic rays (too sharp) / galaxies (too flat)
+        roundness_range=(-0.5, 0.5),  # reject elongated / blended sources
     )
     sources = daofind(data - bkg_mean)
     if sources is None or len(sources) == 0:
@@ -96,10 +99,24 @@ def detect_stars(data, bkg_mean, bkg_std):
     return sources
 
 
+def filter_edge_sources(sources, shape, margin=BORDER_MARGIN_PIX):
+    """Drop detections within `margin` pixels of any image edge.
+
+    Prevents overscan strips, edge glow, or reduction artifacts near the
+    frame border from being misidentified as stars (confirmed visually
+    in ASAS14lq_V_comb_swo.fits, where a row of false detections hugged
+    the y=0 edge).
+    """
+    ny, nx = shape
+    x, y = sources["x_centroid"], sources["y_centroid"]
+    keep = (x > margin) & (x < nx - margin) & (y > margin) & (y < ny - margin)
+    return sources[keep]
+
+
 def filter_isolated(sources, min_sep=MIN_SEPARATION_PIX):
     """Keep only stars with no neighbour within min_sep pixels (avoid blends)."""
     keep = np.ones(len(sources), dtype=bool)
-    xs, ys = sources["xcentroid"], sources["ycentroid"]
+    xs, ys = sources["x_centroid"], sources["y_centroid"]
     for i in range(len(sources)):
         if not keep[i]:
             continue
@@ -116,7 +133,7 @@ def mask_sn_position(sources, sn_xy, radius=SN_EXCLUSION_RADIUS_PIX):
     if sn_xy is None:
         return sources
     sn_x, sn_y = sn_xy
-    d = np.hypot(sources["xcentroid"] - sn_x, sources["ycentroid"] - sn_y)
+    d = np.hypot(sources["x_centroid"] - sn_x, sources["y_centroid"] - sn_y)
     return sources[d > radius]
 
 
@@ -183,6 +200,11 @@ def process_image(path: Path, sn_positions: dict | None = None):
         print(f"  [warn] no sources detected: {path.name}")
         return []
 
+    sources = filter_edge_sources(sources, data.shape)
+    if len(sources) == 0:
+        print(f"  [warn] all detections were within the border margin: {path.name}")
+        return []
+
     sources = filter_isolated(sources)
 
     sn_xy = sn_positions.get(obj) if sn_positions else None
@@ -196,7 +218,7 @@ def process_image(path: Path, sn_positions: dict | None = None):
 
     rows = []
     for row in sources:
-        result = fit_gaussian_fwhm(data, row["xcentroid"], row["ycentroid"])
+        result = fit_gaussian_fwhm(data, row["x_centroid"], row["y_centroid"])
         if result is None:
             continue
         fwhm_x_pix, fwhm_y_pix = result
@@ -206,8 +228,8 @@ def process_image(path: Path, sn_positions: dict | None = None):
             "filter": filt,
             "telescope": tel,
             "file": path.name,
-            "x": row["xcentroid"],
-            "y": row["ycentroid"],
+            "x": row["x_centroid"],
+            "y": row["y_centroid"],
             "flux": row["flux"],
             "fwhm_x_pix": fwhm_x_pix,
             "fwhm_y_pix": fwhm_y_pix,
@@ -272,6 +294,7 @@ if __name__ == "__main__":
 
     # Start with a manageable subset (e.g. 40-60 files spanning both
     # telescopes and both filters) before running on all 716.
-    MAX_IMAGES = 60
+    # Validated on a 60-file batch -- set to None to run the full dataset.
+    MAX_IMAGES = None
 
     run(FITS_DIR, OUT_DIR, sn_positions=SN_POSITIONS, max_images=MAX_IMAGES)
