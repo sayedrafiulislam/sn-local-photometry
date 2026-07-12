@@ -134,8 +134,52 @@ Passed minimum-flux quality flag & 98 \\
 \end{tabular}
 \end{table}
 
-% ---- Bibliography: a simple manual list. Once you have many more
-% references, switch to a .bib file + BibTeX/biblatex instead of this. ----
+\section{Results}
+\label{sec:results}
+
+The pipeline described in Section~\ref{sec:imaging_data}--\ref{sec:zeropoint_calibration} yields a final working sample of 98 SN~Ia host galaxies with a calibrated local $B-V$ colour, measured in a 5.0~kpc physical aperture centred on the supernova position. Table~\ref{tab:final_sample_cuts} summarises the successive cuts applied to reach this sample from the initial 338-object CSP-I/II catalogue; the largest single reduction in sample size arises from zero-point coverage (224 objects with usable imaging reduced to 117 with a corresponding photometric calibration), reflecting a limitation of the calibration files supplied for this project rather than of the imaging or the photometric method itself.
+
+The distribution of calibrated local $B-V$ colour is shown in Figure~\ref{fig:bv_distribution}. The sample has a median local colour of $B-V = 0.73$~mag, with an interquartile range of 0.53--0.91~mag. This range is consistent with what would be expected for a mixture of star-forming and more passive stellar populations local to a SN~Ia site, and is comparable in scale, though not directly comparable in bandpass, to the rest-frame $U-R$ distributions reported for local SN~Ia environments by \citet{Kelsey2021}. The distribution's central value changed negligibly under the minimum-flux quality cut described in Section~\ref{sec:zeropoint_calibration} (median 0.73~mag with or without the cut applied), while the scatter contracted substantially (standard deviation 0.358 to 0.267~mag), indicating that the cut removed unstable low-flux measurements without shifting the sample's central tendency.
+
+The aperture radius used to obtain this result was itself a result of this work, rather than adopted from \citet{Kelsey2021} directly. Figure~\ref{fig:aperture_scatter} shows the population-level scatter in instrumental (pre-calibration) local $B-V$ colour as a function of aperture radius, together with a paired-bootstrap uncertainty band (Section~\ref{sec:aperture_grid}). Scatter is significantly elevated across 1.5--4.5~kpc relative to a 6.5~kpc reference radius, and statistically indistinguishable from that reference across the full 5--10~kpc range tested. A fiducial radius of 5.0~kpc, the smallest radius within this low-scatter plateau, was adopted for the calibrated measurement presented above.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{bv_distribution.png}
+\caption{Distribution of calibrated local $B-V$ colour for the final working sample of 98 objects, measured in a 5.0~kpc aperture. The dashed line marks the sample median.}
+\label{fig:bv_distribution}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{color_scatter_paired_bootstrap.png}
+\caption{Robust scatter (median absolute deviation) in instrumental local $B-V$ colour across the sample as a function of aperture radius, with a paired-bootstrap 16th--84th percentile band (1000 resamples). Radii marked in red are statistically significantly worse than the 6.5~kpc reference (paired bootstrap difference excludes zero).}
+\label{fig:aperture_scatter}
+\end{figure}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{The aperture radius result in the context of Kelsey et al. (2021)}
+
+The most notable methodological result of this work is that the radius range found to have significantly elevated local-colour scatter, approximately 1.5--4.5~kpc, brackets the 4~kpc fiducial aperture adopted by \citet{Kelsey2021} for their local $U-R$ measurement. Several factors distinguish the two analyses sufficiently that this should not be read as a direct challenge to their choice: the colour baseline differs ($B-V$ against rest-frame $U-R$, which trace different combinations of stellar age and dust), the host sample spans a markedly different and much lower redshift range (Section~\ref{sec:redshift_compilation}), and the scatter measurement presented here uses instrumental rather than fully calibrated colour. On this last point, however, there is a specific reason to expect the result to be robust to calibration: the zero-point correction applied in Section~\ref{sec:zeropoint_calibration} is an additive constant per image, common to every aperture radius measured for a given object, and is not expected to alter which radius minimises colour scatter across the sample. The result is therefore reported as a genuine, if preliminary, tension worth further investigation with a larger and more thoroughly calibrated sample, rather than as evidence against the appropriateness of a 4~kpc aperture for the different sample and colour baseline used by \citet{Kelsey2021}.
+
+\subsection{Limitations}
+
+Several limitations of the current analysis are worth stating explicitly rather than leaving implicit. First, the uncertainty quoted on each calibrated colour (Section~\ref{sec:zeropoint_calibration}) propagates only the photometric zero-point uncertainty; a photon-noise contribution from the source flux itself has not yet been derived, so quoted uncertainties should be treated as a lower bound on the true measurement uncertainty. Second, the minimum-flux quality cut used to remove implausible colour outliers (a threshold of 1000 counts in either band) is a heuristic identified by inspecting the most extreme resulting colours, not a formally derived signal-to-noise threshold; a complete treatment would incorporate detector gain and read noise, neither of which has yet been extracted from the available image headers. Third, and most fundamentally, one of the two open questions raised early in this project (Section~\ref{sec:imaging_data}) remains unresolved: whether the combined image stacks used throughout this analysis are genuinely free of light from the supernova itself. If SN light were present in some fraction of the stacks, the local photometry presented here would to some degree reflect a mixture of host-galaxy and transient light rather than the host alone, which would not invalidate the aperture-design methodology but would affect the interpretation of the resulting colours. This should be regarded as an open item for supervisor confirmation before the results presented here are treated as final.
+
+Finally, the sample of 98 objects represents a substantial reduction from the 338-object starting catalogue (Table~\ref{tab:final_sample_cuts}), driven primarily by redshift resolution and zero-point coverage rather than by any property of the local colour measurement itself. Given the multi-stage nature of these cuts, the final sample should not be assumed to be an unbiased subset of the parent CSP-I/II sample without further examination; a comparison of the redshift, host type, or light-curve properties of the retained sample against the full catalogue was outside the scope of this work.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This work has extended the local aperture photometry methodology of \citet{Kelsey2021} from rest-frame $U-R$ colour to observer-frame $B-V$ colour, applied to Type~Ia supernova host galaxies imaged by the Carnegie Supernova Project. A complete pipeline was built from CSP imaging through to a calibrated local colour measurement: photometric redshifts were compiled for 266 of 338 objects via NED; the point-spread function was characterised empirically per telescope and filter, since this sample lacks the uniform seeing selection available to \citet{Kelsey2021}; supernova sky positions were obtained automatically via NED and verified to correspond to the transient site rather than the host nucleus; and a fiducial local aperture radius of 5.0~kpc was justified statistically, via a paired-bootstrap analysis of local colour scatter across the sample, rather than adopted directly from the literature.
+
+The resulting measurement, a calibrated local $B-V$ colour for 98 SN~Ia host galaxies with a median of 0.73~mag, represents a working local-colour catalogue for this sample and a first B-band extension of the Kelsey et al. methodology. The aperture-radius result itself, indicating elevated colour scatter in the 1.5--4.5~kpc range relative to a broader low-scatter plateau from 5--10~kpc, is a genuine finding of this analysis and is discussed above in the context of its limitations.
+
+Remaining work identified over the course of this project includes: resolving whether the CSP image stacks used here are free of supernova light, which bears directly on the interpretation of the measured colours; incorporating a formal photon-noise error budget; and, time permitting, extending the analysis to compare local host colour against SN~Ia light-curve shape and colour parameters, for which a suitable external data source (Uddin et al. 2024, SNooPy light-curve fits for the combined CSP-I/II sample) has been identified but not yet incorporated.
+
+
 \begin{thebibliography}{9}
 
 \bibitem[Hamuy et al.(2006)]{Hamuy2006}
