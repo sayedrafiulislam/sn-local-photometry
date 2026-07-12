@@ -1,0 +1,32 @@
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS-specific
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+*.code-workspace
+
+# Large or regenerable outputs -- uncomment if results/ grows too large
+# for version control. Left commented for now since current outputs are
+# small CSVs/PNGs and are the auditable record of the pipeline.
+# results/**/*.png
+
+# Raw imaging data should never live inside this repo -- it's kept at a
+# separate path (see README) and is referenced by absolute path in each
+# script, not copied in here. This line is a safety net in case a FITS
+# file is ever accidentally placed inside the repo directory.
+*.fits
