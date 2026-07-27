@@ -1,0 +1,10 @@
+object,n_files_affected,original_reason,outcome,resolved_name,redshift,names_tried,error
+CSP12N,3,NED name-checker server error,STILL_ERRORING,,,CSP12N,
+CSP13B,3,NED name-checker server error,STILL_ERRORING,,,CSP13B,
+CSP13C,1,NED name-checker server error,STILL_ERRORING,,,CSP13C,
+CSP13G,1,NED name-checker server error,STILL_ERRORING,,,CSP13G,
+CSP13M,2,NED name-checker server error,STILL_ERRORING,,,CSP13M,
+CSP13N,2,NED name-checker server error,RESOLVED,CSP13N,0.04776,CSP13N,
+CSP13P,3,NED name-checker server error,STILL_ERRORING,,,CSP13P,
+CSP13Q,3,NED name-checker server error,STILL_ERRORING,,,CSP13Q,
+CSP13U,3,NED name-checker server error,STILL_ERRORING,,,CSP13U,

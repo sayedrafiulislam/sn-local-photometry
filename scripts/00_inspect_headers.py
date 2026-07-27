@@ -17,15 +17,26 @@ This script does NOT assume any of that -- it just opens every FITS file it
 finds under a directory, dumps the header, and produces a summary CSV so we
 can decide the next step with real information instead of guessing.
 
+Change log
+----------
+v2: Removed the --limit option. The original run used --limit and, because the
+    file listing is sorted alphabetically, it happened to sample only du Pont
+    (_dup) frames. The plate scale of 0.23 arcsec/pixel was therefore verified
+    for du Pont only, yet is hard-coded downstream in 04_measure_psf_fwhm.py and
+    10_curve_of_growth.py and applied to Swope (_swo) frames as well. This
+    version inspects every file and prints the measured pixel scale grouped by
+    telescope, so that assumption is either confirmed or caught.
+
 Usage
 -----
-    python 00_inspect_headers.py --data-dir /path/to/fits/files --out-csv results/header_summary.csv
+    python 00_inspect_headers.py --data-dir D:\\Thesis\\pd\\CSPAll --out-csv results\\header_summary_full.csv
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+from collections import defaultdict
 from pathlib import Path
 
 from astropy.io import fits
@@ -41,6 +52,29 @@ DEC_KEYS = ["DEC", "SN_DEC", "DEC_SN", "CRVAL2"]
 FILTER_KEYS = ["FILTER", "BAND", "FILTNAME"]
 OBJECT_KEYS = ["OBJECT", "SN_NAME", "TARGET", "SNID"]
 
+# Filename convention: <object>_<filter>_comb_<telescope>.fits
+# These tags are the only record of which telescope took a given frame,
+# since the headers carry no telescope keyword.
+TELESCOPE_TAGS = {"dup": "du Pont", "swo": "Swope"}
+
+
+def telescope_from_filename(path: Path) -> str:
+    """Infer the telescope from the filename tag. Returns 'unknown' if absent."""
+    stem = path.stem.lower()
+    for tag, name in TELESCOPE_TAGS.items():
+        if stem.endswith("_" + tag) or ("_" + tag + "_") in stem:
+            return name
+    return "unknown"
+
+
+def filter_from_filename(path: Path) -> str:
+    """Infer the filter from the filename convention. Returns '' if absent."""
+    parts = path.stem.split("_")
+    # Expect <object>_<filter>_comb_<telescope>
+    if len(parts) >= 2:
+        return parts[1]
+    return ""
+
 
 def find_first_present(header: fits.Header, keys: list[str]):
     """Return (key, value) for the first key in `keys` present in header."""
@@ -52,7 +86,14 @@ def find_first_present(header: fits.Header, keys: list[str]):
 
 def inspect_file(path: Path) -> dict:
     """Open one FITS file and extract everything relevant into a flat dict."""
-    row = {"file": str(path), "readable": True, "error": ""}
+    row = {
+        "file": str(path),
+        "readable": True,
+        "error": "",
+        "wcs_error": "",
+        "telescope_from_name": telescope_from_filename(path),
+        "filter_from_name": filter_from_filename(path),
+    }
 
     try:
         with fits.open(path) as hdul:
@@ -112,28 +153,71 @@ def inspect_file(path: Path) -> dict:
     return row
 
 
+def summarise_pixel_scales(rows: list[dict]) -> None:
+    """
+    Print the measured pixel scale grouped by telescope.
+
+    This is the check that motivated dropping --limit: the value 0.23
+    arcsec/pixel is hard-coded in scripts 04 and 10 and applied to every
+    frame, but was originally verified on du Pont frames only. If Swope
+    frames report a different scale, every Swope aperture radius in kpc and
+    every Swope FWHM in arcsec is wrong -- and since the Swope frames are
+    V-band only, that would show up as a systematic B-V colour error in
+    part of the sample rather than a harmless offset.
+    """
+    by_tel = defaultdict(list)
+    for r in rows:
+        ps = r.get("pixscale_arcsec", "")
+        if ps not in ("", None):
+            by_tel[r.get("telescope_from_name", "unknown")].append(float(ps))
+
+    print("\nPixel scale by telescope (arcsec/pixel):")
+    if not by_tel:
+        print("  No valid WCS found in any file -- nothing to summarise.")
+        return
+
+    for tel in sorted(by_tel):
+        vals = by_tel[tel]
+        # Round before taking the unique set, otherwise floating-point noise
+        # (0.23000000000000403 vs 0.2300000000000012) reports spurious values.
+        uniq = sorted({round(v, 4) for v in vals})
+        print(f"  {tel:>8s}: n={len(vals):4d}  min={min(vals):.5f}  "
+              f"max={max(vals):.5f}  distinct(4dp)={uniq}")
+
+    all_uniq = sorted({round(v, 4) for vals in by_tel.values() for v in vals})
+    if len(all_uniq) == 1:
+        print(f"\n  -> Single plate scale across the whole data set: {all_uniq[0]} arcsec/pixel.")
+        print("     The hard-coded value in scripts 04 and 10 is justified for all frames.")
+    else:
+        print(f"\n  -> WARNING: {len(all_uniq)} distinct plate scales found: {all_uniq}")
+        print("     Scripts 04 and 10 hard-code a single value and must be corrected")
+        print("     to read the scale from each file's own WCS.")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", required=True, type=Path,
-                         help="Directory containing FITS files (searched recursively).")
+                        help="Directory containing FITS files (searched recursively).")
     parser.add_argument("--out-csv", required=True, type=Path,
-                         help="Where to write the summary CSV.")
-    parser.add_argument("--limit", type=int, default=None,
-                         help="Only inspect the first N files (useful for a quick test on 10GB of data).")
+                        help="Where to write the summary CSV.")
     args = parser.parse_args()
 
     fits_files = sorted(
         list(args.data_dir.rglob("*.fits")) + list(args.data_dir.rglob("*.fits.fz"))
     )
-    if args.limit:
-        fits_files = fits_files[: args.limit]
 
     if not fits_files:
         print(f"No .fits or .fits.fz files found under {args.data_dir}")
         return
 
-    print(f"Inspecting {len(fits_files)} files...")
-    rows = [inspect_file(p) for p in fits_files]
+    print(f"Inspecting {len(fits_files)} files (no limit applied)...")
+    rows = []
+    for i, p in enumerate(fits_files, start=1):
+        rows.append(inspect_file(p))
+        # Progress ticker -- a full run over ~700 frames is not instantaneous,
+        # and silence for several minutes is indistinguishable from a hang.
+        if i % 50 == 0 or i == len(fits_files):
+            print(f"  ...{i}/{len(fits_files)}")
 
     fieldnames = sorted(set(k for row in rows for k in row.keys()))
     args.out_csv.parent.mkdir(parents=True, exist_ok=True)
@@ -142,13 +226,31 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"Wrote summary to {args.out_csv}")
+    print(f"\nWrote summary to {args.out_csv}")
 
     # Quick console summary so you get an immediate answer, not just a file.
     n_with_z = sum(1 for r in rows if r.get("redshift_val") not in ("", None))
     n_with_wcs = sum(1 for r in rows if r.get("has_wcs"))
-    print(f"Files with a redshift keyword found: {n_with_z}/{len(rows)}")
+    n_with_filt = sum(1 for r in rows if r.get("filter_val") not in ("", None))
+    n_unreadable = sum(1 for r in rows if not r.get("readable"))
+
+    print(f"Files inspected:                      {len(rows)}")
+    print(f"Files unreadable:                     {n_unreadable}")
+    print(f"Files with a redshift keyword found:  {n_with_z}/{len(rows)}")
+    print(f"Files with a filter keyword found:    {n_with_filt}/{len(rows)}")
     print(f"Files with valid celestial WCS:       {n_with_wcs}/{len(rows)}")
+
+    # Frame counts per telescope/filter as recovered from the filename,
+    # which is the only place that information exists.
+    counts = defaultdict(int)
+    for r in rows:
+        counts[(r.get("telescope_from_name", "unknown"),
+                r.get("filter_from_name", ""))] += 1
+    print("\nFrame counts by telescope and filter (from filename):")
+    for (tel, filt), n in sorted(counts.items()):
+        print(f"  {tel:>8s}  {filt or '(none)':>6s}: {n}")
+
+    summarise_pixel_scales(rows)
 
 
 if __name__ == "__main__":
