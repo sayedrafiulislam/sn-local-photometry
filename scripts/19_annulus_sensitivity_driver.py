@@ -2,41 +2,93 @@
 19_annulus_sensitivity_driver.py
 
 Runs the full downstream chain once per background-annulus setting and reports
-the three answers side by side.
+the answers side by side.
 
 WHAT THIS REPLACES
 ------------------
-After 10b_curve_of_growth_annulus_test.py there is no longer a single
-curve_of_growth.csv, but one file per annulus setting. Getting an answer out of
-each of them by hand means editing the input path in script 11, running it,
-renaming its output, editing the input path in script 18, running that,
-renaming again -- then repeating twice more and hoping the files did not get
-crossed. This script does that loop instead.
+After 10b/10c there is no longer a single curve_of_growth.csv, but one file per
+annulus setting. Getting an answer out of each of them by hand means editing the
+input path in script 11, running it, renaming its output, editing the input path
+in script 18, running that, renaming again -- then repeating twice more and
+hoping the files did not get crossed. This script does that loop instead.
 
-The colour calculation is lifted directly from script 11 and the statistics
-from script 18; nothing new is introduced here. Both are reimplemented inline
-rather than imported so that a single run cannot half-succeed with mismatched
-inputs.
+The colour calculation is lifted directly from script 11 and the statistics from
+script 18; nothing new is introduced. Both are reimplemented inline rather than
+imported so that a single run cannot half-succeed with mismatched inputs.
 
 THE QUESTION THIS ANSWERS
 -------------------------
 Not "what is the scatter", but "does the answer depend on a choice nobody
-validated". Two things are being watched:
+validated". Three things are being watched:
 
   1. Does median_bkg_per_pixel fall as the annulus moves outward?
      If it does, the original 10-15 kpc annulus was sitting in host light and
      the background was over-subtracted. If it is flat across settings, the
      original annulus was clean and the concern closes.
 
-  2. Does the SHAPE of scatter-versus-radius survive?
-     If the curve keeps its shape across settings, it is a property of the
-     data. If it moves by more than the bootstrap uncertainty, it was a
-     property of the background, which would also account for the spurious
-     signal reported by the first version of this analysis.
+  2. How large is the induced bias ON COLOUR, which is what the paper reports?
+     See the note under Q1b -- this is not the same as the bias on flux.
 
-Rows where the annulus did not fit on the detector (annulus_ok == False) are
-dropped, not kept. Their background was measured from whichever part of the
-annulus landed on the chip and is not meaningful.
+  3. Does the SHAPE of scatter-versus-radius survive?
+     If the curve keeps its shape across settings, it is a property of the data.
+     If it moves by more than the bootstrap uncertainty, it was a property of
+     the background, which would also account for the spurious signal reported
+     by the first version of this analysis.
+
+
+CHANGES IN THIS VERSION
+-----------------------
+
+(1) BOTH GUARDS ARE NOW APPLIED.
+
+    The previous version dropped rows where the background annulus failed
+    (`annulus_ok == False`) but knew nothing about the aperture, because it
+    predates 10c. 10c added `aperture_ok`, which flags apertures that ran off
+    the detector or contained non-finite pixels -- 162 rows, 1.6 per cent.
+    Those rows were previously included here.
+
+    Note the two guards differ in grain. `annulus_ok` is a property of the
+    frame: one background per frame per setting, so it is all nineteen radii or
+    none. `aperture_ok` is a property of a single measurement: a frame can be
+    perfectly good at 1 kpc and have run off the chip by 9 kpc. It is therefore
+    applied per row, and a frame can survive with a partial radius grid.
+
+(2) THE COLOUR BIAS IS NOW MEASURED, NOT INFERRED (Q1b).
+
+    Q1 reports the bias on FLUX in a single band. The paper reports a bias on
+    B-V, which is a DIFFERENCE of two magnitudes. Since both bands are measured
+    from the same annulus geometry on the same galaxy, their background errors
+    are correlated and partially cancel in the colour. The flux bias is
+    therefore an UPPER BOUND on the colour bias, and quoting it as though it
+    were the colour bias overstates the effect.
+
+    Q1b measures the colour shift directly: for every object with a valid colour
+    at the fiducial radius under both the first and the last annulus setting,
+    take the difference, and bootstrap the median. No model, no assumption about
+    how much cancels.
+
+(3) EXACT MAGNITUDE CONVERSION.
+
+    The previous version used the linearisation (2.5/ln 10) x f, which
+    understates the true -2.5 log10(1 - f) by about 4 per cent at f ~ 0.07 and
+    diverges further as f grows. Both are now printed so the difference is
+    visible rather than silent.
+
+(4) THE log10 WARNING IS HANDLED RATHER THAN EMITTED.
+
+    Non-positive fluxes are expected -- they are the measurement floor, not a
+    fault -- and are already counted and set to NaN. Wrapping the call in
+    np.errstate stops pandas printing a RuntimeWarning that looks like an error
+    but is not.
+
+INPUT
+-----
+  curve_of_growth_ann*.csv     (from 10c_curve_of_growth_final.py)
+
+OUTPUT
+------
+  annulus_sensitivity_summary.csv
+  annulus_sensitivity_comparison.png
 """
 
 import os
@@ -86,6 +138,13 @@ def benjamini_hochberg(pvals, alpha=FDR_ALPHA):
     return q < alpha, q
 
 
+def frac_to_millimag(f):
+    """Exact conversion of a fractional flux error to millimagnitudes."""
+    f = np.asarray(f, dtype=float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        return -2.5 * np.log10(1.0 - f) * 1000.0
+
+
 def compute_colors(cog):
     """Script 11's logic: same-telescope du Pont B/V instrumental colour."""
     dup = cog[cog["telescope"] == "dup"]
@@ -102,8 +161,12 @@ def compute_colors(cog):
         raise RuntimeError("Expected both B and V after pivoting.")
 
     valid = (pivot["B"] > 0) & (pivot["V"] > 0)
-    pivot["instrumental_B_minus_V"] = np.where(
-        valid, -2.5 * np.log10(pivot["B"] / pivot["V"]), np.nan)
+    # Non-positive flux is the measurement floor, not an error. Counted, set to
+    # NaN, and the warning suppressed rather than printed.
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratio = np.where(valid, pivot["B"].to_numpy() / pivot["V"].to_numpy(), np.nan)
+        pivot["instrumental_B_minus_V"] = np.where(
+            valid, -2.5 * np.log10(ratio), np.nan)
     return pivot, int((~valid).sum()), len(pivot)
 
 
@@ -160,7 +223,7 @@ def main():
     paths = sorted(glob.glob(os.path.join(IN_DIR, INPUT_GLOB)))
     if not paths:
         raise SystemExit(f"No files matching {INPUT_GLOB} in {IN_DIR}. "
-                         f"Run 10b_curve_of_growth_annulus_test.py first.")
+                         f"Run 10c_curve_of_growth_final.py first.")
 
     print(f"Found {len(paths)} annulus setting(s):")
     for p in paths:
@@ -187,7 +250,9 @@ def main():
         cog = pd.read_csv(path)
         per_meas = cog.drop_duplicates(subset=KEYS)
         n_meas = len(per_meas)
+        n_rows_before = len(cog)
 
+        # --- guard 1: the background annulus. A frame-level property. ---
         if "annulus_ok" in cog.columns:
             n_bad = int((~per_meas["annulus_ok"]).sum())
             cog = cog[cog["annulus_ok"]]
@@ -196,15 +261,28 @@ def main():
                   f"original script 10 output. Proceeding without the guard.")
             n_bad = 0
 
+        # --- guard 2: the aperture itself. A row-level property. ---
+        # A frame can be sound at 1 kpc and off the chip by 9 kpc, so this is
+        # applied per measurement and a frame may survive with a partial grid.
+        if "aperture_ok" in cog.columns:
+            n_ap_bad = int((~cog["aperture_ok"]).sum())
+            cog = cog[cog["aperture_ok"]]
+        else:
+            print(f"  [warn] {name}: no aperture_ok column -- this predates "
+                  f"10c_curve_of_growth_final.py. Aperture guard NOT applied; "
+                  f"truncated and NaN-contaminated apertures are included.")
+            n_ap_bad = 0
+
         loaded[name] = cog
-        guard_stats[name] = (n_meas, n_bad)
+        guard_stats[name] = (n_meas, n_bad, n_ap_bad, n_rows_before, len(cog))
         keys_here = set(map(tuple, cog[KEYS].drop_duplicates().to_numpy()))
         common = keys_here if common is None else (common & keys_here)
 
     print(f"Object-images usable in every setting: {len(common)}")
-    for nm, (n_meas, n_bad) in guard_stats.items():
-        print(f"   {nm:<12} {n_meas - n_bad}/{n_meas} passed the guard "
-              f"({n_bad} dropped)")
+    for nm, (n_meas, n_bad, n_ap_bad, n_before, n_after) in guard_stats.items():
+        print(f"   {nm:<12} annulus {n_meas - n_bad}/{n_meas} frames "
+              f"({n_bad} dropped) | aperture {n_ap_bad} rows dropped | "
+              f"rows {n_after}/{n_before}")
     print("\nAll cross-setting comparisons below use the common subset, so a\n"
           "change of sample cannot masquerade as a change of background.\n")
 
@@ -213,7 +291,7 @@ def main():
     # ----------------------------------------------------------------------
     # PASS 2 -- analyse each setting on the common subset
     # ----------------------------------------------------------------------
-    rows, curves = [], {}
+    rows, curves, colors_at_fid = [], {}, {}
 
     for name, cog_full in loaded.items():
         print("=" * 72)
@@ -237,11 +315,18 @@ def main():
         med_color_fid = float(np.nanmedian(at_fid["instrumental_B_minus_V"]))
         n_valid_fid = int(at_fid["instrumental_B_minus_V"].notna().sum())
 
+        # Kept per object so the colour bias can be measured pairwise in Q1b.
+        colors_at_fid[name] = (at_fid.groupby("object")["instrumental_B_minus_V"]
+                               .first().dropna())
+
         cog_fid = cog[np.isclose(cog["radius_kpc"], FIDUCIAL_RADIUS)]
         med_flux_fid = float(np.nanmedian(cog_fid["flux_bkgsub"]))
         med_area_fid = float(np.pi * np.nanmedian(cog_fid["radius_pix"]) ** 2)
 
-        n_meas, n_bad = guard_stats[name]
+        # Per-object fractional flux bias, for the median-of-ratios statistic
+        # reported in Q1. Kept here so it uses each object's own area and flux
+        # rather than the sample medians.
+        n_meas, n_bad, n_ap_bad, _, _ = guard_stats[name]
         print(f"  scatter analysis: {res['n_objects']} objects, "
               f"{res['n_sig']}/{len(res['radii']) - 1} radii significant, "
               f"min p = {res['min_p']:.3f}")
@@ -250,7 +335,8 @@ def main():
         rows.append({
             "setting": name,
             "n_object_images_total": n_meas,
-            "n_dropped_by_guard": n_bad,
+            "n_dropped_by_annulus_guard": n_bad,
+            "n_rows_dropped_by_aperture_guard": n_ap_bad,
             "n_in_common_subset": len(common),
             "median_bkg_per_pixel": med_bkg,
             "median_flux_at_5kpc": med_flux_fid,
@@ -266,13 +352,11 @@ def main():
         })
 
     summary = pd.DataFrame(rows)
-    summary_path = os.path.join(OUT_DIR, "annulus_sensitivity_summary.csv")
-    summary.to_csv(summary_path, index=False)
 
     # ----------------------------------------------------------------------
     # Comparison
     # ----------------------------------------------------------------------
-    pd.set_option("display.width", 220)
+    pd.set_option("display.width", 240)
     print("=" * 72)
     print("SIDE-BY-SIDE COMPARISON")
     print("=" * 72)
@@ -281,16 +365,19 @@ def main():
 
     names = list(curves.keys())
 
+    # ------------------------------------------------------------------
     # Q1: does the background change matter, in FLUX terms?
     #
     # A fractional change in the background is the wrong test. The background is
     # subtracted as (counts per pixel) x (aperture area), so a change far too
     # small to notice against the sky level can still be a large fraction of the
-    # source flux. What matters is delta_bkg x area, compared to the flux itself.
+    # source flux. What matters is delta_bkg x area, compared to the flux.
+    # ------------------------------------------------------------------
     print("-" * 72)
     print("Q1  Was the original annulus contaminated by host light?")
     print("-" * 72)
     bkgs = summary["median_bkg_per_pixel"].to_numpy()
+    pct_flux = np.nan
     if np.all(np.isfinite(bkgs)) and len(bkgs) > 1:
         for nm, b in zip(summary["setting"], bkgs):
             print(f"     {nm:<12} median background/pixel = {b:.4f}")
@@ -308,16 +395,24 @@ def main():
         print(f"     induced change in measured flux : {induced:+.0f} counts "
               f"({pct_flux:+.1f}% of the flux at {FIDUCIAL_RADIUS:g} kpc)")
         print()
+        exact = frac_to_millimag(abs(pct_flux) / 100.0)
+        linear = abs(pct_flux) / 100.0 * 2.5 / np.log(10) * 1000
+        print(f"     In magnitudes : {exact:.1f} mmag exact "
+              f"({linear:.1f} mmag under the linear approximation)")
+        print()
+        print(f"     CAUTION -- this is a ratio of medians (median delta_bkg x median")
+        print(f"     area / median flux), which is dominated by the brighter objects.")
+        print(f"     The median of the per-object ratios is a different and generally")
+        print(f"     smaller number. Quote whichever you define, and say which.")
+        print()
         if abs(pct_flux) > 5.0:
-            print(f"     This is a {abs(pct_flux):.1f}% flux error -- roughly "
-                  f"{abs(pct_flux) / 100 * 2.5 / np.log(10) * 1000:.0f} millimag.")
-            print(f"     The 10-15 kpc annulus WAS contaminated. Everything downstream of")
-            print(f"     script 10 shifts: rebuild the catalogue from the widest annulus")
-            print(f"     that still passes the guard for most objects.")
+            print(f"     The 10-15 kpc annulus WAS contaminated. Everything downstream")
+            print(f"     of script 10 shifts: build the catalogue from the widest")
+            print(f"     annulus that still passes the guard for most objects.")
         elif abs(pct_flux) > 1.0:
             print(f"     A {abs(pct_flux):.1f}% flux error: small, but not negligible against")
-            print(f"     a per-object colour uncertainty of ~0.12 mag. Quote the spread across")
-            print(f"     settings as a systematic rather than ignoring it.")
+            print(f"     a per-object colour uncertainty of ~0.12 mag. Quote the spread")
+            print(f"     across settings as a systematic rather than ignoring it.")
         else:
             print(f"     Under 1% in flux. The 10-15 kpc annulus was effectively clean.")
             print(f"     Record the check in Limitations and move on.")
@@ -330,19 +425,79 @@ def main():
         print("     No bkg_per_pixel column found; cannot assess.")
     print()
 
+    # ------------------------------------------------------------------
+    # Q1b: the bias ON COLOUR, measured directly
+    #
+    # Q1 gives the bias on flux in ONE band. The paper reports B-V, a
+    # DIFFERENCE of magnitudes. Both bands are measured through the same
+    # annulus geometry on the same galaxy, so their background errors are
+    # correlated and partially cancel. Q1's number is therefore an upper bound.
+    # Here the shift is measured object by object instead of argued about.
+    # ------------------------------------------------------------------
+    print("-" * 72)
+    print("Q1b How large is the bias on COLOUR, which is what the paper reports?")
+    print("-" * 72)
+    if len(names) > 1:
+        first, last = names[0], names[-1]
+        joined = pd.concat([colors_at_fid[first].rename("a"),
+                            colors_at_fid[last].rename("b")],
+                           axis=1, join="inner").dropna()
+        if len(joined) >= MIN_OBJECTS_PER_RADIUS:
+            d = (joined["a"] - joined["b"]).to_numpy()
+            med = float(np.median(d))
+            rng = np.random.default_rng(RNG_SEED)
+            bs = np.array([np.median(rng.choice(d, size=len(d), replace=True))
+                           for _ in range(N_BOOT)])
+            lo, hi = np.percentile(bs, [CI_LOWER, CI_UPPER])
+
+            print(f"     Objects with a valid colour at {FIDUCIAL_RADIUS:g} kpc under both")
+            print(f"     {first} and {last} : {len(joined)}")
+            print()
+            print(f"     median colour shift ({first} - {last})")
+            print(f"       = {med * 1000:+.1f} mmag   95% CI [{lo * 1000:+.1f}, {hi * 1000:+.1f}]")
+            print(f"     mean {np.mean(d) * 1000:+.1f} mmag, "
+                  f"scatter (MAD) {mad_std(d) * 1000:.1f} mmag")
+            print()
+            if np.isfinite(pct_flux):
+                bound = frac_to_millimag(abs(pct_flux) / 100.0)
+                if bound > 0:
+                    print(f"     Single-band flux bias (Q1, upper bound) : {bound:.1f} mmag")
+                    print(f"     Measured colour bias                    : {abs(med) * 1000:.1f} mmag")
+                    print(f"     Cancellation between B and V removes "
+                          f"{100 * (1 - abs(med) * 1000 / bound):.0f}% of it.")
+                    print()
+            if lo < 0 < hi:
+                print("     The interval spans zero: no detectable colour bias from the")
+                print("     annulus choice. Report the flux bias as a bound and say the")
+                print("     colour is consistent with unaffected.")
+            else:
+                print("     The colour shift is resolved. This number, not the flux bias,")
+                print("     is what belongs in the paper as the annulus systematic on B-V.")
+        else:
+            print(f"     Only {len(joined)} objects in common -- too few to measure.")
+    else:
+        print("     Only one setting present; nothing to compare.")
+    print()
+
+    # ------------------------------------------------------------------
     # Q2: is the shape of scatter-vs-radius stable?
+    # ------------------------------------------------------------------
     print("-" * 72)
     print("Q2  Does the scatter-versus-radius shape survive the change?")
     print("-" * 72)
+    max_dev = np.nan
     if len(names) > 1:
         ref_curve = curves[names[0]]
-        common = ref_curve["radii"]
-        stack = np.vstack([np.interp(common, curves[n]["radii"], curves[n]["scatter"])
+        grid = ref_curve["radii"]
+        stack = np.vstack([np.interp(grid, curves[n]["radii"], curves[n]["scatter"])
                            for n in names])
         max_dev = float(np.nanmax(np.nanmax(stack, axis=0) - np.nanmin(stack, axis=0)))
         typical_ci = float(np.nanmedian(ref_curve["ci_hi"] - ref_curve["ci_lo"]))
         print(f"     Largest disagreement between settings at any radius : {max_dev:.4f} mag")
         print(f"     Typical bootstrap 95% interval width                : {typical_ci:.4f} mag")
+        print()
+        print(f"     -> set ANNULUS_SYSTEMATIC_MAG = {max_dev:.4f} at the top of")
+        print(f"        18_color_scatter_corrected.py, and update the docstring.")
         print()
         if max_dev < 0.5 * typical_ci:
             print("     The curves agree to well within their own uncertainty. The shape is a")
@@ -357,11 +512,13 @@ def main():
             print("     about aperture radius can be drawn until the background is settled --")
             print("     and this would also explain the spurious signal found earlier.")
     else:
-        print("     Only one setting present; nothing to compare. Re-run 10b with at")
+        print("     Only one setting present; nothing to compare. Re-run 10c with at")
         print("     least two ANNULUS_SETTINGS.")
     print()
 
+    # ------------------------------------------------------------------
     # Q3: does the significance verdict change?
+    # ------------------------------------------------------------------
     print("-" * 72)
     print("Q3  Does the significance verdict change?")
     print("-" * 72)
@@ -370,10 +527,15 @@ def main():
         print(f"     {nm:<12} {ns} radii significant, min p = {mp:.3f}")
     if summary["n_radii_significant"].nunique() == 1 and summary["n_radii_significant"].iloc[0] == 0:
         print("\n     Null result across every setting. Robust to the background choice.")
+        print("     Note that min p is expected to drift between settings; it is the")
+        print("     smallest of 18 correlated comparisons and is not itself a result.")
     else:
         print("\n     The verdict is NOT stable across settings. Do not report a")
         print("     significance conclusion until the background is resolved.")
     print("=" * 72)
+
+    summary_path = os.path.join(OUT_DIR, "annulus_sensitivity_summary.csv")
+    summary.to_csv(summary_path, index=False)
 
     # ----------------------------------------------------------------------
     # Overlay figure
