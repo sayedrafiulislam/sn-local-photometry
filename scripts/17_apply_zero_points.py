@@ -6,7 +6,8 @@ defects found in the audit are corrected, and the largest single cut in the
 pipeline is made visible instead of being reported as a warning about missing
 files.
 
-Named 15c because 15b is already taken by 15b_apply_galactic_extinction.py.
+Runs at step 17. Its output feeds step 18 (quality flags), which feeds step
+19 (Galactic extinction).
 
 WHAT THIS DOES
 --------------
@@ -489,8 +490,7 @@ def main():
   flux quartile, 33.2 in the faintest). Report it as a LOWER BOUND.
 
   NOTE: this is the observed colour. Galactic extinction has not been applied.
-  Run 16_flag_low_flux_colors.py, then 15b_apply_galactic_extinction.py --
-  in that order, despite the numbering.""")
+  Next: 18_flag_unreliable_colours.py, then 19_apply_galactic_extinction.py.""")
     print("=" * 74)
 
 

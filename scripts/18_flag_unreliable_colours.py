@@ -375,8 +375,7 @@ def main():
 
     print(f"""
 IMPORTANT: filter downstream on `flag_exclude`, not `flag_low_flux`.
-15b_apply_galactic_extinction.py currently filters on flag_low_flux and MUST be
-updated, or the calibration criterion will have no effect on the final sample.
+Steps 19 and 20 already do. flag_low_flux is retained for comparison only.
 
 The thresholds above (background fraction {MAX_BKG_FRAC:g}, colour error
 {MAX_COLOUR_ERR:g} mag) are proposals. Record the values agreed with your
