@@ -1,5 +1,5 @@
-"""
-03_get_positions_and_epochs.py
+﻿"""
+05_get_positions_and_epochs.py
 
 Purpose
 -------
@@ -28,7 +28,7 @@ exactly how to interpret every aperture measurement that follows.
 
 Usage
 -----
-    python 03_get_positions_and_epochs.py --data-dir "D:\\Thesis\\pd\\CSPAll" --out-csv results\\positions_epochs.csv
+    python 05_get_positions_and_epochs.py --data-dir "D:\\Thesis\\pd\\CSPAll" --out-csv results\\positions_epochs.csv
 """
 
 from __future__ import annotations

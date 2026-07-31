@@ -1,5 +1,5 @@
-"""
-17b_plot_final_bv_distribution_corrected.py
+﻿"""
+20_plot_bv_distribution.py
 
 Supersedes 17_plot_final_bv_distribution.py. Produces the local B-V colour
 distribution for the Results section.
@@ -130,7 +130,7 @@ def main():
     if not os.path.exists(IN_PATH):
         raise SystemExit(
             f"\nInput not found:\n  {IN_PATH}\n"
-            f"Run 15d_apply_galactic_extinction_corrected.py first.\n"
+            f"Run 19_apply_galactic_extinction.py first.\n"
             f"(Order is 15c -> 16c -> 15d -> 17b, despite the numbering.)")
 
     df = pd.read_csv(IN_PATH)

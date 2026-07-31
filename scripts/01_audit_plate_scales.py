@@ -1,5 +1,5 @@
-"""
-00b_plate_scale_audit.py
+﻿"""
+01_audit_plate_scales.py
 
 Purpose
 -------
@@ -11,7 +11,7 @@ The original reconnaissance run used --limit and, because the file listing is
 sorted alphabetically, sampled only du Pont frames -- all of which reported
 0.23 arcsec/pixel. That value was hard-coded into:
 
-    04_measure_psf_fwhm.py   PLATE_SCALE_ARCSEC_PER_PIX = 0.23
+    06_measure_psf_fwhm.py   PLATE_SCALE_ARCSEC_PER_PIX = 0.23
     10_curve_of_growth.py    PLATE_SCALE_ARCSEC_PER_PIX = 0.23
     check_aperture_overlay.py PLATE_SCALE = 0.23
 
@@ -33,8 +33,8 @@ size of the problem before deciding how to respond:
 
 Usage
 -----
-    python 00b_plate_scale_audit.py --summary-csv results\\header_summary_full.csv
-    python 00b_plate_scale_audit.py --summary-csv results\\header_summary_full.csv --catalog-csv results\\calibrated_color_5kpc_flagged.csv
+    python 01_audit_plate_scales.py --summary-csv results\\header_summary_full.csv
+    python 01_audit_plate_scales.py --summary-csv results\\header_summary_full.csv --catalog-csv results\\calibrated_color_5kpc_flagged.csv
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ def object_from_filename(fname: str) -> str:
     """
     Recover the object name from <object>_<filter>_comb_<telescope>.fits.
 
-    This mirrors the parsing in 01_build_catalog.py. Kept local rather than
+    This mirrors the parsing in 02_build_catalog.py. Kept local rather than
     imported so this audit stays a standalone diagnostic.
     """
     stem = Path(str(fname)).stem

@@ -1,4 +1,4 @@
-"""
+﻿"""
 00_inspect_headers.py
 
 Purpose
@@ -22,7 +22,7 @@ Change log
 v2: Removed the --limit option. The original run used --limit and, because the
     file listing is sorted alphabetically, it happened to sample only du Pont
     (_dup) frames. The plate scale of 0.23 arcsec/pixel was therefore verified
-    for du Pont only, yet is hard-coded downstream in 04_measure_psf_fwhm.py and
+    for du Pont only, yet is hard-coded downstream in 06_measure_psf_fwhm.py and
     10_curve_of_growth.py and applied to Swope (_swo) frames as well. This
     version inspects every file and prints the measured pixel scale grouped by
     telescope, so that assumption is either confirmed or caught.

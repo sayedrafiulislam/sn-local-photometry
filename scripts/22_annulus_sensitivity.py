@@ -1,5 +1,5 @@
-"""
-19_annulus_sensitivity_driver.py
+﻿"""
+22_annulus_sensitivity.py
 
 Runs the full downstream chain once per background-annulus setting and reports
 the answers side by side.
@@ -83,7 +83,7 @@ CHANGES IN THIS VERSION
 
 INPUT
 -----
-  curve_of_growth_ann*.csv     (from 10c_curve_of_growth_final.py)
+  curve_of_growth_ann*.csv     (from 13_curve_of_growth.py)
 
 OUTPUT
 ------
@@ -223,7 +223,7 @@ def main():
     paths = sorted(glob.glob(os.path.join(IN_DIR, INPUT_GLOB)))
     if not paths:
         raise SystemExit(f"No files matching {INPUT_GLOB} in {IN_DIR}. "
-                         f"Run 10c_curve_of_growth_final.py first.")
+                         f"Run 13_curve_of_growth.py first.")
 
     print(f"Found {len(paths)} annulus setting(s):")
     for p in paths:
@@ -269,7 +269,7 @@ def main():
             cog = cog[cog["aperture_ok"]]
         else:
             print(f"  [warn] {name}: no aperture_ok column -- this predates "
-                  f"10c_curve_of_growth_final.py. Aperture guard NOT applied; "
+                  f"13_curve_of_growth.py. Aperture guard NOT applied; "
                   f"truncated and NaN-contaminated apertures are included.")
             n_ap_bad = 0
 

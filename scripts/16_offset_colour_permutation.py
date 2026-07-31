@@ -1,7 +1,7 @@
-"""
-09d_nuclear_contamination_permutation.py
+﻿"""
+16_offset_colour_permutation.py
 
-Control test for the step detected by 09c_nuclear_contamination_test.py.
+Control test for the step detected by 15_offset_colour_test.py.
 
 The result being controlled
 ---------------------------
@@ -56,7 +56,7 @@ Three tests are run:
 
 Usage
 -----
-    python 09d_nuclear_contamination_permutation.py ^
+    python 16_offset_colour_permutation.py ^
         --colors results\\phase4_aperture\\local_color_vs_radius.csv ^
         --positions results\\sn_position_verification.csv ^
         --out-prefix results\\phase4_aperture\\nuclear_permutation

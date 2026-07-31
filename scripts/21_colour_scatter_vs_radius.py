@@ -1,5 +1,5 @@
-"""
-18b_color_scatter_corrected.py
+﻿"""
+21_colour_scatter_vs_radius.py
 
 Supersedes 18_color_scatter_corrected.py, which superseded scripts 13 and 14.
 Same measurement -- robust scatter in instrumental local B-V colour as a
@@ -51,7 +51,7 @@ by script 10 might be contaminated by host light, and that no aperture-radius
 conclusion should be trusted until that was checked. It was checked, and the
 warning was justified.
 
-Running 10c_curve_of_growth_final.py at three annulus settings gives a median
+Running 13_curve_of_growth.py at three annulus settings gives a median
 background per pixel, across the 532 object-images usable at all three, of
 1.6254 counts at 10-15 kpc, 0.4022 at 15-25 kpc and 0.1931 at 20-30 kpc: a fall
 of 88 per cent. An exponential-plus-constant fit to those three points returns a
@@ -88,7 +88,7 @@ A wider annulus is unnecessary, and would cost objects -- the guard already
 fails on the three lowest-redshift hosts at this setting, where a 30 kpc annulus
 subtends more sky than the detector covers.
 
-19_annulus_sensitivity_driver.py confirms the null result holds at all three
+22_annulus_sensitivity.py confirms the null result holds at all three
 settings, the largest disagreement between them being 0.0336 mag against a
 typical bootstrap interval width of 0.0887 mag.
 
@@ -158,7 +158,7 @@ FDR_ALPHA = 0.05
 MIN_OBJECTS_PER_RADIUS = 5
 
 # Largest disagreement in scatter between background-annulus settings, taken
-# from 19_annulus_sensitivity_driver.py with BOTH guards applied. Reported below
+# from 22_annulus_sensitivity.py with BOTH guards applied. Reported below
 # alongside the statistical bound, since the two are comparable in size. Update
 # this if the annulus settings in 10c change and the driver is re-run.
 ANNULUS_SYSTEMATIC_MAG = 0.0336
@@ -213,7 +213,7 @@ if not os.path.exists(COLOR_CSV):
         COLOR_CSV = legacy
     else:
         raise SystemExit(f"Input not found:\n  {COLOR_CSV}\n"
-                         f"Run 11b_local_color_vs_radius_corrected.py first.")
+                         f"Run 14_local_colour_vs_radius.py first.")
 
 df = pd.read_csv(COLOR_CSV)
 
@@ -407,7 +407,7 @@ if np.isfinite(median_sigma):
     print(f"  -> radius-to-radius spread is {spread / median_sigma:.2f}x the single-measurement "
           f"uncertainty")
 print(f"Background-annulus systematic         : {ANNULUS_SYSTEMATIC_MAG:.3f} mag "
-      f"(19_annulus_sensitivity_driver.py)")
+      f"(22_annulus_sensitivity.py)")
 print(f"  -> comparable to the {spread:.3f} mag radius spread itself; the aperture question")
 print(f"     is bounded by systematics as well as by statistical power.")
 if n_catalogue is not None:

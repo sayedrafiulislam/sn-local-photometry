@@ -1,5 +1,5 @@
-"""
-08_fetch_sn_coordinates.py
+﻿"""
+10_fetch_sn_coordinates.py
 
 Phase 3, Question 2 / Phase 4 dependency: fetch a sky position (RA/Dec)
 for every SN host galaxy with a resolved redshift, so that curve-of-

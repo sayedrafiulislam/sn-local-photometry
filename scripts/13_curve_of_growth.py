@@ -1,5 +1,5 @@
-"""
-10c_curve_of_growth_final.py
+﻿"""
+13_curve_of_growth.py
 
 Supersedes 10b_curve_of_growth_annulus_test.py. The measurement and the
 multi-annulus design are unchanged; four defects found in the audit of 10b are
@@ -492,7 +492,7 @@ How to read this:
 
 CAUTION: the frames failing the guard differ between settings, so the rows
 behind each line are not the same sample. For a controlled comparison run
-19_annulus_sensitivity_driver.py, which restricts every setting to the frames
+22_annulus_sensitivity.py, which restricts every setting to the frames
 usable in all of them.
 
 DOWNSTREAM: filter on annulus_ok AND aperture_ok. 10b's instruction to filter on

@@ -1,5 +1,5 @@
-"""
-09_spotcheck_sn_coordinates.py
+﻿"""
+11_spotcheck_sn_coordinates.py
 
 Verifies what the NED-returned RA/Dec in sn_coordinates.csv actually
 points at: the SN explosion site (what we need for local aperture

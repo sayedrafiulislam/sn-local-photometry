@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Runs the SN local photometry pipeline in the corrected order.
 
@@ -124,7 +124,7 @@ if (Test-Phase "0") {
         -Note "Do NOT pass --limit. The original limited run sampled only du Pont frames and produced the single-plate-scale assumption (C2)." `
         -Arguments @("--data-dir", "`"$DataDir`"", "--out-csv", "`"$R\header_summary_full.csv`"")
 
-    Invoke-Step -Name "Plate scale audit" -Script "00b_plate_scale_audit.py" -Diagnostic `
+    Invoke-Step -Name "Plate scale audit" -Script "01_audit_plate_scales.py" -Diagnostic `
         -Arguments @("--summary-csv", "`"$R\header_summary_full.csv`"",
                      "--catalog-csv", "`"$P5\calibrated_color_5kpc_flagged.csv`"",
                      "--out-csv", "`"$R\plate_scale_status.csv`"")
@@ -134,16 +134,16 @@ if (Test-Phase "0") {
 # Phase 1 - Catalogue and redshifts
 # ---------------------------------------------------------------------------
 if (Test-Phase "1") {
-    Invoke-Step -Name "Build catalogue and query NED" -Script "01_build_catalog.py" `
+    Invoke-Step -Name "Build catalogue and query NED" -Script "02_build_catalog.py" `
         -Note "Queries NED for every unique object. Requires network." `
         -Arguments @("--data-dir", "`"$DataDir`"", "--out-csv", "`"$R\sn_catalog_v2.csv`"")
 
-    Invoke-Step -Name "Split on redshift availability" -Script "02_apply_redshift_cut.py" `
+    Invoke-Step -Name "Split on redshift availability" -Script "04_apply_redshift_cut.py" `
         -Arguments @("--in-csv", "`"$R\sn_catalog_v2.csv`"",
                      "--out-csv", "`"$R\sn_catalog_final.csv`"",
                      "--excluded-csv", "`"$R\excluded_objects_log.csv`"")
 
-    Invoke-Step -Name "Retry failed NED queries" -Script "01b_retry_failed_ned.py" -Diagnostic `
+    Invoke-Step -Name "Retry failed NED queries" -Script "03_retry_failed_ned.py" -Diagnostic `
         -Note "Only informative when NED's name-checker backend is healthy. If most results come back STILL_ERRORING, rerun later." `
         -Arguments @("--log-csv", "`"$R\excluded_objects_log.csv`"",
                      "--out-csv", "`"$R\ned_retry_results.csv`"")
@@ -153,17 +153,17 @@ if (Test-Phase "1") {
 # Phase 2 - PSF characterisation
 # ---------------------------------------------------------------------------
 if (Test-Phase "2") {
-    Invoke-Step -Name "Measure PSF FWHM per star" -Script "04_measure_psf_fwhm.py" -Slow `
+    Invoke-Step -Name "Measure PSF FWHM per star" -Script "06_measure_psf_fwhm.py" -Slow `
         -Note "Opens every FITS file. The only Phase 2 step that touches the images; everything after works from the per-star table."
 
-    Invoke-Step -Name "Flag image quality (corrected)" -Script "05b_flag_image_quality_corrected.py" `
+    Invoke-Step -Name "Flag image quality (corrected)" -Script "07_flag_image_quality.py" `
         -Note "Supersedes 05. Applies per-frame plate scales and rejects sub-half-median detections (C6, C7)." `
         -Arguments @("--per-star", "`"$P1\psf_fwhm_per_star.csv`"",
                      "--header-summary", "`"$R\header_summary_full.csv`"",
                      "--out-flags", "`"$P1\image_quality_flags_corrected.csv`"",
                      "--out-excluded", "`"$P1\excluded_images_phase1_corrected.csv`"")
 
-    Invoke-Step -Name "PSF summary table (corrected)" -Script "06b_psf_summary_corrected.py" `
+    Invoke-Step -Name "PSF summary table (corrected)" -Script "08_summarise_psf.py" `
         -Note "Supersedes 06. Produces Table 2 with a cluster-bootstrap uncertainty (C3)." `
         -Arguments @("--per-star", "`"$P1\psf_fwhm_per_star.csv`"",
                      "--header-summary", "`"$R\header_summary_full.csv`"",
@@ -175,10 +175,10 @@ if (Test-Phase "2") {
 # Phase 3 - Supernova positions
 # ---------------------------------------------------------------------------
 if (Test-Phase "3") {
-    Invoke-Step -Name "Fetch SN coordinates from NED" -Script "08_fetch_sn_coordinates.py" `
+    Invoke-Step -Name "Fetch SN coordinates from NED" -Script "10_fetch_sn_coordinates.py" `
         -Note "Runs before 07b/10. If SN masking in script 04 is ever enabled, this must move ahead of 04 (RUN_ORDER Issue 1)."
 
-    Invoke-Step -Name "Spot-check SN positions" -Script "09_spotcheck_sn_coordinates.py" -Diagnostic `
+    Invoke-Step -Name "Spot-check SN positions" -Script "11_spotcheck_sn_coordinates.py" -Diagnostic `
         -Note "Writes PNG cutouts for visual confirmation that the SN lands on the host."
 }
 
@@ -186,7 +186,7 @@ if (Test-Phase "3") {
 # Phase 4 - Aperture design and photometry
 # ---------------------------------------------------------------------------
 if (Test-Phase "4") {
-    Invoke-Step -Name "Aperture floor per object (corrected)" -Script "07b_aperture_floor_per_object_corrected.py" `
+    Invoke-Step -Name "Aperture floor per object (corrected)" -Script "09_aperture_floor_per_object.py" `
         -Note "Supersedes 07. Reads the per-star table directly rather than per_file_summary.csv, so the wrong plate scale does not propagate." `
         -Arguments @("--per-star", "`"$P1\psf_fwhm_per_star.csv`"",
                      "--header-summary", "`"$R\header_summary_full.csv`"",
@@ -206,7 +206,7 @@ if (Test-Phase "4") {
     Invoke-Step -Name "Colour scatter vs radius (corrected)" -Script "18_color_scatter_corrected.py" `
         -Note "NOT YET AUDITED. Supersedes 12, 13 and 14."
 
-    Invoke-Step -Name "Annulus sensitivity driver" -Script "19_annulus_sensitivity_driver.py" `
+    Invoke-Step -Name "Annulus sensitivity driver" -Script "22_annulus_sensitivity.py" `
         -Note "NOT YET AUDITED."
 }
 

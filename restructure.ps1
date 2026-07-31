@@ -1,4 +1,4 @@
-# restructure.ps1
+﻿# restructure.ps1
 #
 # One-off repository reorganisation after the pipeline audit.
 #
@@ -142,9 +142,9 @@ Write-Host ""
 Write-Host "--- promoting 09b/09c/09d to the pipeline ---" -ForegroundColor Cyan
 
 $promote = @(
-    "09b_verify_sn_positions.py",
-    "09c_nuclear_contamination_test.py",
-    "09d_nuclear_contamination_permutation.py"
+    "12_verify_sn_positions.py",
+    "15_offset_colour_test.py",
+    "16_offset_colour_permutation.py"
 )
 
 foreach ($name in $promote) {

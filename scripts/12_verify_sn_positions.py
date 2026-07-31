@@ -1,5 +1,5 @@
-"""
-09b_verify_sn_positions.py
+﻿"""
+12_verify_sn_positions.py
 
 Quantitative replacement for the three-object visual spot check.
 
@@ -55,7 +55,7 @@ is modified; one new CSV is written.
 
 Usage
 -----
-    python 09b_verify_sn_positions.py --coords results\\sn_coordinates.csv ^
+    python 12_verify_sn_positions.py --coords results\\sn_coordinates.csv ^
         --out-csv results\\sn_position_verification.csv --limit 20
 """
 

@@ -1,5 +1,5 @@
-"""
-11b_local_color_vs_radius_corrected.py
+﻿"""
+14_local_colour_vs_radius.py
 
 Supersedes 11_local_color_vs_radius.py. The measurement is unchanged: local
 instrumental B-V as a function of aperture radius, from same-telescope du Pont
@@ -141,7 +141,7 @@ import pandas as pd
 # --------------------------------------------------------------------------
 # Configuration
 # --------------------------------------------------------------------------
-# One of the tags written by 10c_curve_of_growth_final.py:
+# One of the tags written by 13_curve_of_growth.py:
 # "ann10-15", "ann15-25", "ann20-30".
 ANNULUS_TAG = "ann20-30"
 
@@ -177,7 +177,7 @@ def main():
     if not os.path.exists(COG_CSV):
         raise SystemExit(
             f"Input not found:\n  {COG_CSV}\n"
-            f"Run 10c_curve_of_growth_final.py first, or change ANNULUS_TAG "
+            f"Run 13_curve_of_growth.py first, or change ANNULUS_TAG "
             f"at the top of this script."
         )
 
@@ -225,7 +225,7 @@ def main():
               f"(off-chip or non-finite pixels)")
     else:
         print("  [warn] no aperture_ok column -- this predates "
-              "10c_curve_of_growth_final.py. Truncated and NaN-contaminated "
+              "13_curve_of_growth.py. Truncated and NaN-contaminated "
               "apertures are being included.")
 
     # ----------------------------------------------------------------------

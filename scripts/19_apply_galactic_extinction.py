@@ -1,5 +1,5 @@
-"""
-15d_apply_galactic_extinction_corrected.py
+﻿"""
+19_apply_galactic_extinction.py
 
 Supersedes 15b_apply_galactic_extinction.py. The physics is unchanged and was
 correct; five defects around it are fixed.
@@ -187,7 +187,7 @@ def main():
     elif "flag_low_flux" in calib.columns:
         flag_col = "flag_low_flux"
         print("[WARN] no flag_exclude column found -- this catalogue predates "
-              "16c_flag_unreliable_colors.py. Falling back to flag_low_flux, "
+              "18_flag_unreliable_colours.py. Falling back to flag_low_flux, "
               "which applies only the old absolute-count criterion. The "
               "calibration-quality criterion will NOT be reflected below.")
     else:
@@ -302,7 +302,7 @@ def main():
     except ImportError:
         pass
 
-    print("\n  Next: 17b_plot_final_bv_distribution_corrected.py, which plots")
+    print("\n  Next: 20_plot_bv_distribution.py, which plots")
     print("  B_minus_V_dered from this file. Script 18 does NOT need re-running:")
     print("  extinction is one additive constant per object and cancels in the")
     print("  paired radius comparison, which uses instrumental colours anyway.")

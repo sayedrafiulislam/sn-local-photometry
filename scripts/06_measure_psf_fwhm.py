@@ -1,5 +1,5 @@
-"""
-04_measure_psf_fwhm.py
+﻿"""
+06_measure_psf_fwhm.py
 
 Phase 1 of the local aperture photometry pipeline: measure the point-spread
 function (PSF) full width at half maximum (FWHM) for each CSP telescope +

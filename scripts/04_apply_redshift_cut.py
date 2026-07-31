@@ -1,9 +1,9 @@
-"""
-02_apply_redshift_cut.py
+﻿"""
+04_apply_redshift_cut.py
 
 Purpose
 -------
-Splits the NED-queried catalog (output of 01_build_catalog.py) into:
+Splits the NED-queried catalog (output of 02_build_catalog.py) into:
 
   (1) sn_catalog_final.csv   -- objects with a resolved redshift; this is
       the working sample for all downstream steps (PSF measurement,
@@ -18,7 +18,7 @@ Splits the NED-queried catalog (output of 01_build_catalog.py) into:
 
 Usage
 -----
-    python 02_apply_redshift_cut.py --in-csv results\\sn_catalog_v2.csv --out-dir results\\
+    python 04_apply_redshift_cut.py --in-csv results\\sn_catalog_v2.csv --out-dir results\\
 """
 
 from __future__ import annotations

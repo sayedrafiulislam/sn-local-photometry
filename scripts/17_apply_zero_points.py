@@ -1,5 +1,5 @@
-"""
-15c_apply_zero_points_corrected.py
+﻿"""
+17_apply_zero_points.py
 
 Supersedes 15_apply_zero_points.py. The calibration itself is unchanged; eight
 defects found in the audit are corrected, and the largest single cut in the
@@ -311,7 +311,7 @@ def main():
     if not os.path.exists(COG_CSV):
         raise SystemExit(
             f"\nInput not found:\n  {COG_CSV}\n"
-            f"Run 10c_curve_of_growth_final.py first, or change ANNULUS_TAG.")
+            f"Run 13_curve_of_growth.py first, or change ANNULUS_TAG.")
 
     print("\n" + "=" * 74)
     print(f"PHOTOMETRY  (annulus {ANNULUS_TAG})")

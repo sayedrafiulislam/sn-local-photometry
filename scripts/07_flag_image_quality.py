@@ -1,5 +1,5 @@
-"""
-05b_flag_image_quality_corrected.py
+﻿"""
+07_flag_image_quality.py
 
 Corrected replacement for 05_flag_image_quality.py.
 
@@ -46,7 +46,7 @@ Nothing existing is overwritten: output goes to new filenames.
 
 Usage
 -----
-    python 05b_flag_image_quality_corrected.py ^
+    python 07_flag_image_quality.py ^
         --per-star results\\phase1_psf\\psf_fwhm_per_star.csv ^
         --header-summary results\\header_summary_full.csv ^
         --out-flags results\\phase1_psf\\image_quality_flags_corrected.csv ^

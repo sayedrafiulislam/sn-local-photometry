@@ -1,4 +1,4 @@
-# Local B–V Aperture Photometry of CSP Type Ia Supernova Host Galaxies
+﻿# Local B–V Aperture Photometry of CSP Type Ia Supernova Host Galaxies
 
 This repository contains the data pipeline for a thesis project extending the local
 aperture photometry methodology of Kelsey et al. (2021, MNRAS 501, 4861) from
@@ -23,9 +23,9 @@ than silently dropped.
 | Phase | Description | Key scripts |
 |---|---|---|
 | 0 | U−R → B−V substitution rationale | — (methodological discussion only) |
-| 1 | PSF FWHM measurement / seeing floor | `04_measure_psf_fwhm.py`, `05_flag_image_quality.py`, `06_clean_group_summary.py` |
-| 2 | Redshift compilation via NED | `01_build_catalog.py`, `02_apply_redshift_cut.py` |
-| 3 | SN sky coordinate resolution | `08_fetch_sn_coordinates.py`, `09_spotcheck_sn_coordinates.py` |
+| 1 | PSF FWHM measurement / seeing floor | `06_measure_psf_fwhm.py`, `05_flag_image_quality.py`, `06_clean_group_summary.py` |
+| 2 | Redshift compilation via NED | `02_build_catalog.py`, `04_apply_redshift_cut.py` |
+| 3 | SN sky coordinate resolution | `10_fetch_sn_coordinates.py`, `11_spotcheck_sn_coordinates.py` |
 | 4 | Curve-of-growth aperture design | `07_aperture_floor_per_object.py`, `10_curve_of_growth.py`, `11_local_color_vs_radius.py`, `12_color_scatter_vs_radius.py`, `14_color_scatter_paired_bootstrap.py` |
 | 5 | Zero-point calibration | `15_apply_zero_points.py`, `16_flag_low_flux_colors.py` |
 
@@ -80,9 +80,9 @@ Scripts are numbered in pipeline order and are intended to be run sequentially
 from the repository root, e.g.:
 
 ```powershell
-python scripts\01_build_catalog.py
-python scripts\02_apply_redshift_cut.py
-python scripts\04_measure_psf_fwhm.py
+python scripts\02_build_catalog.py
+python scripts\04_apply_redshift_cut.py
+python scripts\06_measure_psf_fwhm.py
 ...
 ```
 

@@ -1,5 +1,5 @@
-"""
-07b_aperture_floor_per_object_corrected.py
+﻿"""
+09_aperture_floor_per_object.py
 
 Corrected replacement for 07_aperture_floor_per_object.py.
 
@@ -58,7 +58,7 @@ comparison is relative.
 
 Usage
 -----
-    python 07b_aperture_floor_per_object_corrected.py ^
+    python 09_aperture_floor_per_object.py ^
         --per-star results\\phase1_psf\\psf_fwhm_per_star.csv ^
         --header-summary results\\header_summary_full.csv ^
         --flags results\\phase1_psf\\image_quality_flags_corrected.csv ^

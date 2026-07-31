@@ -1,12 +1,12 @@
-"""
-09c_nuclear_contamination_test.py
+﻿"""
+15_offset_colour_test.py
 
 Tests whether host-galaxy nuclear light measurably contaminates the local
 aperture colour, using each galaxy as its own control.
 
 Background
 ----------
-09b_verify_sn_positions.py established that 58 per cent of supernovae in this
+12_verify_sn_positions.py established that 58 per cent of supernovae in this
 sample sit within 5 kpc of their host's centre, so for those objects the
 nucleus falls inside a 5 kpc aperture centred on the explosion site.
 
@@ -56,7 +56,7 @@ there cannot manufacture a result here.
 
 Usage
 -----
-    python 09c_nuclear_contamination_test.py ^
+    python 15_offset_colour_test.py ^
         --colors results\\phase4_aperture\\local_color_vs_radius.csv ^
         --positions results\\sn_position_verification.csv ^
         --out-prefix results\\phase4_aperture\\nuclear_contamination

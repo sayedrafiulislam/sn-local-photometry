@@ -1,9 +1,9 @@
-"""
-01b_retry_failed_ned.py
+﻿"""
+03_retry_failed_ned.py
 
 Purpose
 -------
-Re-query NED for the objects that 01_build_catalog.py failed to resolve, in
+Re-query NED for the objects that 02_build_catalog.py failed to resolve, in
 order to separate two things that the original run conflated:
 
     (a) objects NED genuinely cannot resolve, because the name is a
@@ -14,7 +14,7 @@ order to separate two things that the original run conflated:
 
 Why this is needed
 ------------------
-01_build_catalog.py retries a query only when the exception message contains
+02_build_catalog.py retries a query only when the exception message contains
 "timeout" or "timed out":
 
     is_timeout = "timed out" in str(e).lower() or "timeout" in str(e).lower()
@@ -45,11 +45,11 @@ Outcomes reported
 Usage
 -----
     # the 9 server-error objects only (the default, and the point of the script)
-    python 01b_retry_failed_ned.py --log-csv results\\excluded_objects_log.csv \\
+    python 03_retry_failed_ned.py --log-csv results\\excluded_objects_log.csv \\
                                    --out-csv results\\ned_retry_results.csv
 
     # all 72 excluded objects, as a completeness check
-    python 01b_retry_failed_ned.py --log-csv results\\excluded_objects_log.csv \\
+    python 03_retry_failed_ned.py --log-csv results\\excluded_objects_log.csv \\
                                    --out-csv results\\ned_retry_all.csv --all
 """
 
@@ -78,7 +78,7 @@ def is_transient_error(exc: Exception) -> bool:
     """
     Decide whether a failed NED query is worth retrying.
 
-    This is the corrected version of the test in 01_build_catalog.py, which
+    This is the corrected version of the test in 02_build_catalog.py, which
     only recognised timeouts. A transient failure is one where the service
     misbehaved; a definitive failure is one where the service answered
     clearly and told us the name is not recognised.
@@ -106,7 +106,7 @@ def generate_alt_names(object_name: str) -> list[str]:
     """
     Candidate IAU-style designations for a CSP object name.
 
-    Identical in behaviour to the function in 01_build_catalog.py, reproduced
+    Identical in behaviour to the function in 02_build_catalog.py, reproduced
     here so this diagnostic runs standalone. Two rules:
 
       1. ASAS-SN internal name  -> IAU name       (ASAS14ad  -> SN2014ad)
@@ -269,7 +269,7 @@ def main():
     print()
     if n_resolved:
         print(f"  {n_resolved} object(s) were excluded in error and can be reinstated.")
-        print("  Their exclusion was caused by the retry policy in 01_build_catalog.py")
+        print("  Their exclusion was caused by the retry policy in 02_build_catalog.py")
         print("  treating a NED server error as a definitive name failure.")
     else:
         print("  No object was recovered. The original exclusions stand, but the")

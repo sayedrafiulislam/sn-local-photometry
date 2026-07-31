@@ -1,5 +1,5 @@
-"""
-16c_flag_unreliable_colors.py
+﻿"""
+18_flag_unreliable_colours.py
 
 Supersedes 16_flag_low_flux_colors.py and 16b_flag_unreliable_colors.py.
 Flags catalogue entries whose colour cannot be trusted, using two independent

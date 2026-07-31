@@ -1,5 +1,5 @@
-"""
-06b_psf_summary_corrected.py
+﻿"""
+08_summarise_psf.py
 
 Purpose
 -------
@@ -52,7 +52,7 @@ have.
 
 Usage
 -----
-    python 06b_psf_summary_corrected.py ^
+    python 08_summarise_psf.py ^
         --per-star results\\phase1_psf\\psf_fwhm_per_star.csv ^
         --header-summary results\\header_summary_full.csv ^
         --excluded results\\phase1_psf\\excluded_images_phase1.csv ^

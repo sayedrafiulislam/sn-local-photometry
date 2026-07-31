@@ -1,5 +1,5 @@
-"""
-01_build_catalog.py
+﻿"""
+02_build_catalog.py
 
 Purpose
 -------
@@ -33,7 +33,7 @@ Requirements
 
 Usage
 -----
-    python 01_build_catalog.py --data-dir "D:\\Thesis\\pd\\CSPAll" --out-csv results\\sn_catalog.csv
+    python 02_build_catalog.py --data-dir "D:\\Thesis\\pd\\CSPAll" --out-csv results\\sn_catalog.csv
 
 Notes
 -----
