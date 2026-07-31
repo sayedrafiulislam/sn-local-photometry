@@ -18,7 +18,7 @@ WHAT WAS WRONG WITH SCRIPT 17
 
 (2) IT FILTERED ON `flag_low_flux`.
 
-    That was script 16's single absolute-count criterion. 16c replaces it with
+    That was script 16's single absolute-count criterion. step 18 replaces it with
     two scale-free criteria combined into `flag_exclude`. This script prefers
     the new flag and falls back loudly.
 
@@ -131,7 +131,7 @@ def main():
         raise SystemExit(
             f"\nInput not found:\n  {IN_PATH}\n"
             f"Run 19_apply_galactic_extinction.py first.\n"
-            f"(Order is 15c -> 16c -> 15d -> 17b, despite the numbering.)")
+            f"(Order is step 17 -> 18 -> 19 -> 20.)")
 
     df = pd.read_csv(IN_PATH)
 
@@ -139,7 +139,7 @@ def main():
     if "B_minus_V_dered" not in df.columns:
         raise SystemExit(
             "\nNo B_minus_V_dered column -- this file has not been through the "
-            "extinction step. Run 15d first.\n")
+            "extinction step. Run step 19 first.\n")
 
     # (2) prefer the combined flag
     if "flag_exclude" in df.columns:

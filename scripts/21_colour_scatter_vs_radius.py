@@ -99,14 +99,14 @@ exceed the effect being sought.
 
 INPUTS AND FLAGS
 ----------------
-Reads the TAGGED colour file written by 11b and verifies its annulus_tag column
+Reads the TAGGED colour file written by step 14 and verifies its annulus_tag column
 against ANNULUS_TAG below, so the input cannot silently be from a different
 background setting.
 
 Filters the calibrated catalogue on `flag_exclude`, the combined criterion
-written by 16c (background fraction and quoted colour uncertainty). The previous
+written by step 18 (background fraction and quoted colour uncertainty). The previous
 version filtered on `flag_low_flux`, which was script 16's single absolute-count
-criterion and is retained by 16c for comparison only.
+criterion and is retained by step 18 for comparison only.
 
 NOTE ON THE CATALOGUE CUTS AND THIS ANALYSIS
 --------------------------------------------
@@ -121,7 +121,7 @@ instrumental colours -- some of them are the best-measured objects in the
 sample, with fluxes above 10^6 counts. Excluding them here would discard
 excellent data for a reason that does not apply.
 
-The same argument applies to 09c and 09d.
+The same argument applies to step 15 and step 16.
 """
 
 import os
@@ -160,7 +160,7 @@ MIN_OBJECTS_PER_RADIUS = 5
 # Largest disagreement in scatter between background-annulus settings, taken
 # from 22_annulus_sensitivity.py with BOTH guards applied. Reported below
 # alongside the statistical bound, since the two are comparable in size. Update
-# this if the annulus settings in 10c change and the driver is re-run.
+# this if the annulus settings in step 13 change and the driver is re-run.
 ANNULUS_SYSTEMATIC_MAG = 0.0336
 
 
@@ -225,11 +225,11 @@ if "annulus_tag" in df.columns:
     if tags != [ANNULUS_TAG]:
         raise SystemExit(
             f"\nAnnulus mismatch. This script is set to {ANNULUS_TAG}, but the "
-            f"input\ncarries {tags}. Re-run 11b with a matching ANNULUS_TAG, or "
+            f"input\ncarries {tags}. Re-run step 14 with a matching ANNULUS_TAG, or "
             f"change it here.\n")
     print(f"[ok] input provenance verified: annulus_tag = {ANNULUS_TAG}")
 else:
-    print("[warn] input has no annulus_tag column -- it predates 11b, so its "
+    print("[warn] input has no annulus_tag column -- it predates step 14, so its "
           "background\n       setting cannot be verified.")
 
 wide = df.pivot_table(index="object", columns="radius_kpc",
@@ -310,14 +310,14 @@ n_catalogue = None
 median_color = np.nan
 if os.path.exists(CALIB_CSV):
     calib = pd.read_csv(CALIB_CSV)
-    # flag_exclude is 16c's combined criterion (background fraction AND quoted
+    # flag_exclude is step 18's combined criterion (background fraction AND quoted
     # colour uncertainty). flag_low_flux is script 16's superseded absolute
-    # count cut, retained by 16c for comparison only.
+    # count cut, retained by step 18 for comparison only.
     if "flag_exclude" in calib.columns:
         flag_col = "flag_exclude"
     elif "flag_low_flux" in calib.columns:
         flag_col = "flag_low_flux"
-        print("[warn] catalogue has no flag_exclude column -- it predates 16c. "
+        print("[warn] catalogue has no flag_exclude column -- it predates step 18. "
               "Falling back\n       to flag_low_flux, which applies only the "
               "old absolute-count criterion.")
     else:

@@ -6,7 +6,7 @@ the answers side by side.
 
 WHAT THIS REPLACES
 ------------------
-After 10b/10c there is no longer a single curve_of_growth.csv, but one file per
+After 10b/step 13 there is no longer a single curve_of_growth.csv, but one file per
 annulus setting. Getting an answer out of each of them by hand means editing the
 input path in script 11, running it, renaming its output, editing the input path
 in script 18, running that, renaming again -- then repeating twice more and
@@ -43,7 +43,7 @@ CHANGES IN THIS VERSION
 
     The previous version dropped rows where the background annulus failed
     (`annulus_ok == False`) but knew nothing about the aperture, because it
-    predates 10c. 10c added `aperture_ok`, which flags apertures that ran off
+    predates step 13. step 13 added `aperture_ok`, which flags apertures that ran off
     the detector or contained non-finite pixels -- 162 rows, 1.6 per cent.
     Those rows were previously included here.
 
@@ -512,7 +512,7 @@ def main():
             print("     about aperture radius can be drawn until the background is settled --")
             print("     and this would also explain the spurious signal found earlier.")
     else:
-        print("     Only one setting present; nothing to compare. Re-run 10c with at")
+        print("     Only one setting present; nothing to compare. Re-run step 13 with at")
         print("     least two ANNULUS_SETTINGS.")
     print()
 

@@ -23,7 +23,7 @@ zero-point files.
 So the calibrated colour is script 11's instrumental colour shifted by one
 additive constant per object. That is worth keeping in mind: any analysis
 performed WITHIN an object across radii is unaffected by this step entirely,
-which is why scripts 09c, 09d and 18 can work on instrumental colours and remain
+which is why scripts step 15, step 16 and 18 can work on instrumental colours and remain
 independent of everything here.
 
 Zero-point file format, confirmed against B_ZP_dup.dat:
@@ -74,7 +74,7 @@ WHAT WAS WRONG WITH SCRIPT 15
 (1) THE APERTURE GUARD WAS NOT APPLIED.
 
     Script 15 reads the curve-of-growth file directly rather than script 11's
-    output, so 11b's guard does not protect it. 162 rows with an aperture
+    output, so step 14's guard does not protect it. 162 rows with an aperture
     running off the frame edge or containing non-finite pixels flowed into the
     calibrated catalogue.
 
@@ -170,7 +170,7 @@ import pandas as pd
 # --------------------------------------------------------------------------
 # Configuration
 # --------------------------------------------------------------------------
-# Must match the tag used in 11b, or the calibrated colours will not correspond
+# Must match the tag used in step 14, or the calibrated colours will not correspond
 # to the colours analysed in scripts 18 and 19.
 ANNULUS_TAG = "ann20-30"
 
@@ -330,7 +330,7 @@ def main():
         print(f"  annulus guard                    : {n_meas - n_bad}/{n_meas} "
               f"object-images kept ({n_bad} excluded)")
     else:
-        print("  [warn] no annulus_ok column -- output predates 10b/10c. The "
+        print("  [warn] no annulus_ok column -- output predates 10b/step 13. The "
               "background may be contaminated by host light.")
 
     # (1) Guard 2 -- the aperture itself. A property of a SINGLE MEASUREMENT.
@@ -339,7 +339,7 @@ def main():
         cog = cog[cog["aperture_ok"]]
         print(f"  aperture guard                   : {n_ap_bad} rows excluded")
     else:
-        print("  [warn] no aperture_ok column -- output predates 10c. Truncated "
+        print("  [warn] no aperture_ok column -- output predates step 13. Truncated "
               "and NaN-contaminated apertures are being included.")
 
     fid = cog[np.isclose(cog["radius_kpc"], FIDUCIAL_RADIUS_KPC)

@@ -4,8 +4,8 @@
 Supersedes 15b_apply_galactic_extinction.py. The physics is unchanged and was
 correct; five defects around it are fixed.
 
-Named 15d because 15b is the original of this script and 15c is the corrected
-zero-point script.
+Runs at step 19, after step 18 has written the quality flags. See
+NUMBERING.md for the full order.
 
 
 WHAT THIS DOES
@@ -48,7 +48,7 @@ WHAT WAS WRONG WITH 15b
 
 (1) IT FILTERED ON THE WRONG FLAG.
 
-    `flag_low_flux` was script 16's single absolute-count criterion. 16c
+    `flag_low_flux` was script 16's single absolute-count criterion. step 18
     replaces it with two scale-free criteria and writes the combined result as
     `flag_exclude`. Filtering on the old flag means the calibration-quality
     criterion never reaches the final sample.
@@ -81,9 +81,9 @@ WHAT WAS WRONG WITH 15b
 
 (5) THE EXECUTION ORDER CONTRADICTS THE NUMBERING.
 
-    This script reads the FLAGGED catalogue, which script 16c writes. The real
-    order is 15c -> 16c -> 15d -> 17b. Anyone reading the repository will assume
-    15 -> 15b -> 16 and be wrong.
+    This script reads the FLAGGED catalogue, which script step 18 writes. The real
+    order is step 17 -> 18 -> 19 -> 20. Script numbers now match run order; see
+    NUMBERING.md.
 
 
 CORRECT, AND WORTH KEEPING
@@ -92,7 +92,7 @@ CORRECT, AND WORTH KEEPING
 for two independent reasons: Galactic extinction is a single additive constant
 per object, so it cancels in any within-object comparison across radii; and
 script 18 operates on instrumental colours, which never receive the correction.
-The same argument makes the offset-colour result of 09c/09d independent of this
+The same argument makes the offset-colour result of step 15/step 16 independent of this
 entire calibration chain.
 
 
@@ -100,7 +100,7 @@ OUTPUT
 ------
   calibrated_color_5kpc_dered.csv
 
-All rows are written with flags preserved. Filtering is left to script 17b.
+All rows are written with flags preserved. Filtering is left to script step 20.
 """
 
 import os
@@ -173,7 +173,7 @@ def main():
     from astropy.coordinates import SkyCoord
     import astropy.units as u
 
-    for path, what in [(IN_PATH, "flagged colours (run 16c first)"),
+    for path, what in [(IN_PATH, "flagged colours (run step 18 first)"),
                        (COORDS_CSV, "SN coordinates (run script 08 first)")]:
         if not os.path.exists(path):
             sys.exit(f"\n  Input not found -- {what}:\n    {path}\n")

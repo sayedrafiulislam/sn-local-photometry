@@ -49,7 +49,7 @@ WHAT WAS WRONG WITH SCRIPT 11
 (1) THE APERTURE GUARD WAS MISSING.
 
     Script 11 filtered on `annulus_ok` -- whether the background ring fitted on
-    the detector -- but predates 10c, which added `aperture_ok` for the aperture
+    the detector -- but predates step 13, which added `aperture_ok` for the aperture
     itself. photutils tolerates an aperture running off the frame edge and
     returns the sum of whichever pixels exist, while the subtracted background
     still uses the full geometric area. 162 rows across the sample were affected
@@ -61,7 +61,7 @@ WHAT WAS WRONG WITH SCRIPT 11
 
     Once local_color_vs_radius_pre_annulus_fix.csv existed, that condition was
     permanently false and every subsequent run overwrote the output with no
-    backup whatsoever. Replaced with timestamped backups, matching 10c.
+    backup whatsoever. Replaced with timestamped backups, matching step 13.
 
 (3) THE OUTPUT CARRIED NO RECORD OF WHICH BACKGROUND BUILT IT.
 
@@ -122,7 +122,7 @@ WHAT WAS WRONG WITH SCRIPT 11
 OUTPUT
 ------
   local_color_vs_radius_{TAG}.csv    canonical, provenance in the name
-  local_color_vs_radius.csv          identical copy, for scripts 12-18 and 09c/09d
+  local_color_vs_radius.csv          identical copy, for steps 15 to 22
 
 Both are written. Downstream scripts continue to work unchanged while the tagged
 file preserves provenance. Existing files are renamed to *.bak_YYYYmmdd_HHMMSS,
@@ -341,7 +341,7 @@ def main():
     print(f"\nWrote {len(pivot)} rows ({pivot['object'].nunique()} objects)")
     print(f"  canonical : {os.path.basename(OUT_TAGGED)}")
     print(f"  compat    : {os.path.basename(OUT_COMPAT)}  "
-          f"(identical; for scripts 12-18 and 09c/09d)")
+          f"(identical; for steps 15 to 22)")
 
     at_fid = pivot[np.isclose(pivot["radius_kpc"], FIDUCIAL_RADIUS)]
     n_fid = int(at_fid["instrumental_B_minus_V"].notna().sum())
