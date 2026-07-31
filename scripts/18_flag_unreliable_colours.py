@@ -141,7 +141,7 @@ Columns added:
   flag_low_flux              legacy absolute-count flag, COMPARISON ONLY
   flag_exclude               fails A or B. THIS is the flag to filter on.
 
-*** 15b_apply_galactic_extinction.py currently filters on flag_low_flux and
+*** Steps 19 and 20 filter on flag_exclude. flag_low_flux is retained in
 *** must be changed to flag_exclude, or these criteria will have no effect.
 """
 

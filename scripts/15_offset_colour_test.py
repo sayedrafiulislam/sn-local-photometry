@@ -57,9 +57,9 @@ there cannot manufacture a result here.
 Usage
 -----
     python 15_offset_colour_test.py ^
-        --colors results\\phase4_aperture\\local_color_vs_radius.csv ^
+        --colors results\\phase4_aperture\\local_color_vs_radius_ann20-30.csv ^
         --positions results\\sn_position_verification.csv ^
-        --out-prefix results\\phase4_aperture\\nuclear_contamination
+        --out-prefix results\\phase4_aperture\\nuclear_contamination_ann20-30
 """
 
 from __future__ import annotations

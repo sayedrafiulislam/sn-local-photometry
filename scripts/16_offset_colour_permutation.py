@@ -5,12 +5,12 @@ Control test for the step detected by 15_offset_colour_test.py.
 
 The result being controlled
 ---------------------------
-09c compared, for each object, the median colour at aperture radii below that
+Step 15 compared, for each object, the median colour at aperture radii below
 object's own projected galactocentric offset D against the median at radii
 above it. D is the radius at which the host nucleus first enters the aperture.
-Across 98 objects the median step was
+Across 101 objects the median step was
 
-    +0.0197 mag,  95 per cent bootstrap CI [+0.0098, +0.0337]
+    +0.0220 mag,  95 per cent bootstrap CI [+0.0135, +0.0331]
 
 which excludes zero.
 
@@ -44,7 +44,7 @@ Three tests are run:
   TEST A  Permutation null for the median step. The primary control.
 
   TEST B  Permutation null for the rank correlation between offset and the
-          slope of colour with radius. 09c's Test 2 predicted that objects with
+          slope of colour with radius. Step 15's Test 2 predicted that objects
           larger offsets should show more positive slopes, since for them the
           nucleus enters only at large radii. This checks that trend against
           chance pairing.
@@ -57,9 +57,9 @@ Three tests are run:
 Usage
 -----
     python 16_offset_colour_permutation.py ^
-        --colors results\\phase4_aperture\\local_color_vs_radius.csv ^
+        --colors results\\phase4_aperture\\local_color_vs_radius_ann20-30.csv ^
         --positions results\\sn_position_verification.csv ^
-        --out-prefix results\\phase4_aperture\\nuclear_permutation
+        --out-prefix results\\phase4_aperture\\nuclear_permutation_ann20-30
 """
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# Kept identical to 09c so the observed statistic is reproduced exactly.
+# Kept identical to step 15 so the observed statistic is reproduced exactly.
 MAX_PLAUSIBLE_OFFSET_KPC = 45.0
 MIN_MEANINGFUL_OFFSET_KPC = 0.05
 MIN_RADII_PER_OBJECT = 10
